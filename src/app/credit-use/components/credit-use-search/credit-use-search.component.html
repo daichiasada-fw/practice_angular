@@ -1,0 +1,59 @@
+<mat-dialog-content>
+<div class="searchItemWrapp" fxLayout="row" fxLayoutGap="8px">
+    <div class="label">利用日</div>
+    <div fxFlex="40">
+        <mat-form-field>
+            <input [(ngModel)]="model.useDateFrom" matInput [matDatepicker]="pickerFrom" [max]="model.useDateTo" style="padding-left:15px;padding-right:10px;">
+            <mat-datepicker-toggle matSuffix [for]="pickerFrom" (keydown.enter)="$event.stopPropagation();"></mat-datepicker-toggle>
+            <mat-datepicker #pickerFrom></mat-datepicker>
+            <mat-hint>開始日</mat-hint>
+        </mat-form-field>
+    </div>
+    <div fxFlex="40" fxFlexAlign="end center">
+        <mat-form-field>
+            <input [(ngModel)]="model.useDateTo" matInput [matDatepicker]="pickerTo"  [min]="model.useDateFrom" style="padding-left:15px;padding-right:10px;">
+            <mat-datepicker-toggle matSuffix [for]="pickerTo" (keydown.enter)="$event.stopPropagation();"></mat-datepicker-toggle>
+            <mat-datepicker #pickerTo [startAt]="calcStartAtToDate()"></mat-datepicker>
+            <mat-hint>終了日</mat-hint>
+        </mat-form-field>
+    </div>
+</div>
+<div class="searchItemWrapp">
+    <div class="label">科目</div>
+    <mat-form-field>
+        <mat-select [(ngModel)]="model.accountCode" name="accountCode" matInput (keydown.backspace)="model.accountCode = '';" (keydown.enter)="$event.stopPropagation();">
+            <mat-option value=""></mat-option>
+            <mat-option *ngFor="let account of accounts" [value]="account.accountCode">
+                {{account.accountName}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>
+<div class="searchItemWrapp">
+    <div class="label">理由</div>
+    <mat-form-field>
+        <input matInput [(ngModel)]="model.reason" name="reason">
+    </mat-form-field>
+</div>
+<div class="searchItemWrapp">
+    <div class="label">内容</div>
+    <mat-form-field>
+        <input matInput [(ngModel)]="model.content" name="content">
+    </mat-form-field>
+</div>
+<div class="searchItemWrapp">
+    <div class="label">支払者</div>
+    <mat-form-field>
+        <input matInput [(ngModel)]="model.cardUserName" [matAutocomplete]="auto" [formControl]="usersControl" (keydown.enter)="$event.stopPropagation();">
+        <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let user of filteredUsers | async" [value]="user.name" [id]="user.emailAddress">
+                {{user.name}}
+            </mat-option>
+        </mat-autocomplete>
+    </mat-form-field>
+</div>
+</mat-dialog-content>
+<mat-dialog-actions fxFlexLayout="row" fxFlexLayoutGap="10px" fxLayoutAlign="end center">
+    <button mat-stroked-button tabindex="-1" (click)="onCancel();" fxFlex="30">キャンセル</button>
+    <button mat-raised-button color="primary" class="execButton" (click)="onExec();" fxFlex="40">検索</button>
+</mat-dialog-actions>

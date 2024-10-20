@@ -1,0 +1,180 @@
+<mat-toolbar>
+    <mat-toolbar-row fxLayout="row" fxLayoutGap="15px">
+        <div class="title" fxFlex="18">クレジットカード<br>利用報告</div>
+        <mat-card class="search" fxLayout="row" fxLayoutGap="8px;" fxFlex="50">
+            <button mat-icon-button matPrefix matTooltip="検索" (click)="searchCresitUseHistory()" fxFlex="5" fxFlexOffset="6">
+                <mat-icon matPrefix class="searchIcon">search</mat-icon>
+            </button>
+            <input [(ngModel)]="searchOptions.searchWord" type="search" [placeholder]="searchPlaceholder" (keyup.enter)="searchCresitUseHistory()" (keyup)="searchAll($event)" fxFlex="80"/>
+            <button mat-icon-button matSafix matTooltip="検索オプションを表示" (click)="openDialogSearch()" fxFlex="5">
+                <mat-icon matSafix class="searchIcon">arrow_drop_down</mat-icon>
+            </button>
+        </mat-card>
+        <mat-select [(ngModel)]="this.searchOptions.bizYear" name="bizYear" matInput class="selectBizYear" (selectionChange)="searchBizYear()" fxFlex="8">
+            <mat-option *ngFor="let year of selectBizYears;" [value]="year">{{year}}年度</mat-option>
+        </mat-select>
+        <button mat-mini-fab fxFlexOffset="20" [matTooltip]="operatorText" class="operaterIcon" matTooltipClass="toolTipOperator"
+        [style.backgroundImage]="'url(' + operator?.photoURL + ')'"
+        (click)="openDialogOperatorInfo();"
+        >
+        </button>
+    </mat-toolbar-row>
+</mat-toolbar>
+<mat-drawer-container>
+    <mat-drawer mode="side" opened class="left-drawer">
+        <button mat-raised-button class="addButton" (click)="openDialogAdd();">
+            <div style="display:inline-flex;">
+                <mat-icon class="addIcon">add</mat-icon>
+                <span class="addText">作成</span>
+            </div>
+        </button>
+        <mat-list>
+            <mat-list-item fxLayout="row">
+                <mat-icon>credit_card</mat-icon>
+                <span class="sideMenu">クレジットカード</span>
+                <button class="sideMenu" mat-icon-button [matMenuTriggerFor]="creditMenu">
+                    <mat-icon>navigate_next</mat-icon>
+                </button>
+                <mat-menu #creditMenu="matMenu" xPosition="after" yPosition="below">
+                    <button mat-menu-item (click)="router.navigateByUrl('credituse/hist');">
+                        <span>利用報告</span>
+                    </button>
+                    <button mat-menu-item (click)="router.navigateByUrl('credituse/monthcheck');">
+                        <span>月別情報</span>
+                    </button>
+                    <button mat-menu-item (click)="router.navigateByUrl('credituse/monthcheck');">
+                        <span>カード保持者管理</span>
+                    </button>
+                </mat-menu>
+            </mat-list-item>
+            <mat-divider class="sideMenu"></mat-divider>
+            <mat-list-item fxLayout="row">
+                <mat-icon>credit_card</mat-icon>
+                <span class="sideMenu">振り込み</span>
+                <button class="sideMenu" mat-icon-button [matMenuTriggerFor]="creditMenu">
+                    <mat-icon>navigate_next</mat-icon>
+                </button>
+                <mat-menu #creditMenu="matMenu" xPosition="after" yPosition="below">
+                    <button mat-menu-item (click)="router.navigateByUrl('credituse/hist');">
+                        <span>利用報告</span>
+                    </button>
+                    <button mat-menu-item (click)="router.navigateByUrl('credituse/monthcheck');">
+                        <span>月別情報</span>
+                    </button>
+                    <button mat-menu-item (click)="router.navigateByUrl('credituse/monthcheck');">
+                        <span>カード保持者管理</span>
+                    </button>
+                </mat-menu>
+            </mat-list-item>
+        </mat-list>
+    </mat-drawer>
+    <mat-drawer-content>
+        <div [class.loading]="showSearchProgress" [class.contents]="!showSearchProgress">
+            <mat-progress-spinner color="primary" mode="indeterminate" *ngIf="showSearchProgress"></mat-progress-spinner>
+            <table mat-table matSort [dataSource]="dataSource" [hidden]="showSearchProgress">
+                <ng-container matColumnDef="menu">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let data">
+                        <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="機能選択" (click)="$event.stopPropagation();">
+                            <mat-icon>more_vert</mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                            <button mat-menu-item (click)="openDialogRef(data)">
+                                <mat-icon>visibility</mat-icon>
+                                <span>照会</span>
+                            </button>
+                            <button mat-menu-item (click)="openDialogReturnAmountAdd(data)">
+                                <mat-icon>money</mat-icon>
+                                <span>返金登録</span>
+                            </button>
+                            <button mat-menu-item (click)="openDialogEdit(data)">
+                                <mat-icon>edit</mat-icon>
+                                <span>変更</span>
+                            </button>
+                            <button mat-menu-item (click)="openDialogCopy(data)">
+                                <mat-icon>file_copy</mat-icon>
+                                <span>再利用</span>
+                            </button>
+                            <button mat-menu-item (click)="openDialogDel(data)">
+                                <mat-icon>delete</mat-icon>
+                                <span>削除</span>
+                            </button>
+                        </mat-menu>
+                    </td>
+                </ng-container>
+                <tbody>
+                <ng-container matColumnDef="id">
+                    <th mat-header-cell *matHeaderCellDef>id</th>
+                    <td mat-cell *matCellDef="let data"> {{data.id}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="bizYear">
+                    <th mat-header-cell *matHeaderCellDef>年度</th>
+                    <td mat-cell *matCellDef="let data"> {{data.bizYear}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="useDate">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>利用日</th>
+                    <td mat-cell *matCellDef="let data"> {{data.useDate.toDate() | date:'shortDate'}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="cardUserId">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>支払者</th>
+                    <td mat-cell *matCellDef="let data"> {{data.cardUserId}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="cardUserName">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>支払者</th>
+                    <td mat-cell *matCellDef="let data"> {{data.cardUserName}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="accountCode">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>科目</th>
+                    <td mat-cell *matCellDef="let data"> {{data.accountCode}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="accountName">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>科目</th>
+                    <td mat-cell *matCellDef="let data"> {{data.accountName}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="reason">
+                    <th mat-header-cell *matHeaderCellDef>理由</th>
+                    <td mat-cell *matCellDef="let data">
+                        <pre>{{data.reason}}</pre>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="content">
+                    <th mat-header-cell *matHeaderCellDef>内容</th>
+                    <td mat-cell *matCellDef="let data"> 
+                        <pre>{{data.content}}</pre>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="amount">
+                    <th mat-header-cell *matHeaderCellDef  mat-sort-header arrowPosition="before" class="col-number">利用額</th>
+                    <td mat-cell *matCellDef="let data" class="col-number"> {{data.amount | currency : 'JPY'}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="returnAmount">
+                    <th mat-header-cell *matHeaderCellDef  mat-sort-header arrowPosition="before" class="col-number">返金額</th>
+                    <td mat-cell *matCellDef="let data" class="col-number"> {{data.returnAmount | currency : 'JPY'}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="users">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>利用者</th>
+                    <td mat-cell *matCellDef="let data"> {{data.users}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="_createTimeStamp">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>登録日</th>
+                    <td mat-cell *matCellDef="let data"> {{data._createTimeStamp.toDate() | date:'shortDate'}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" valign="top" (click)="openDialogRef(row)"></tr>
+            </table>
+        </div>
+    </mat-drawer-content>
+</mat-drawer-container>

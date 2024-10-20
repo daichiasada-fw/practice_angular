@@ -1,0 +1,60 @@
+/* inputカーソルオン*/
+input,textarea {
+    cursor: default;
+}
+
+/* 理由と内容欄の横スクロールの表示解除 */
+textarea.mat-input-element {
+    overflow: hidden;
+}
+
+/* カード利用者一覧*/
+.usersListItem {
+    height :23px !important;
+    font-size: 14px;
+}
+
+/* Chips */
+mat-chip {
+    font-size: 90%;
+}
+
+/* 横幅指定 */
+.size-m {
+    width: 220px;
+}
+
+/* 返金一覧 */
+table.usersTable {
+    width:100%;
+}
+div.usersTable {
+    max-height:300px;
+    overflow-y:scroll;
+}
+
+.rowReturnAmount {
+    height: 30px;
+}
+
+tr.rowReturnAmount > td,
+tr.rowReturnAmount > th {
+    padding-left: 12px;
+}
+
+
+div.inputUserName {
+    width: 100px;
+}
+
+div.inputReturnAmonunt {
+    width: 60px;
+}
+
+div.inputEmailAddress {
+    width: 200px;
+}
+
+div.inputReturnMethod {
+    width: 80px;
+}

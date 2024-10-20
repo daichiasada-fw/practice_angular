@@ -1,0 +1,128 @@
+<form #formCheck="ngForm" class="formCheck">
+<mat-dialog-content fxLayout="row" fxLayoutGap="20px">
+    <div class="inputItems" fxFlex="30">
+        <mat-form-field>
+            <mat-label>利用日</mat-label>
+            <input [(ngModel)]="readOnlymodel.useDate" name="useDate" #useDate="ngModel"
+            matInput [matDatepicker]="picker" readonly>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>科目</mat-label>
+            <input [(ngModel)]="readOnlymodel.accountName" name="accountName" #accountName="ngModel"
+            matInput readonly>
+        </mat-form-field>
+        <mat-form-field class="size-m">
+            <mat-label>理由</mat-label>
+            <textarea [(ngModel)]="readOnlymodel.reason" name="reason" #reason="ngModel" 
+            matInput cdkTextareaAutosize minRows="2" readonly></textarea>
+        </mat-form-field>
+        <mat-form-field class="size-m">
+            <mat-label>内容</mat-label>
+            <textarea [(ngModel)]="readOnlymodel.content" name="content" #content="ngModel"
+            matInput cdkTextareaAutosize readonly></textarea>
+        </mat-form-field>
+    </div>
+    <div class="inputUsers" fxFlex="69">
+        <div class="inputUsersHeader" fxLayout="row" fxLayoutGap="15px">
+            <mat-form-field class="returnSum" fxFlex="40">
+                <mat-label>返金額合計</mat-label>
+                <span matPrefix>¥&nbsp;</span>
+                <input [(ngModel)]="readOnlymodel.returnAmount" name="returnAmount" #amount="ngModel"
+                matInput type="number" readonly>
+            </mat-form-field>
+            <mat-form-field class="returnSum" fxFlex="40">
+                <mat-label>割振返金額合計</mat-label>
+                <span matPrefix>¥&nbsp;</span>
+                <input [(ngModel)]="readOnlymodel.returnAmountSum" name="sumReturnAmount" #amount="ngModel"
+                matInput type="number" readonly>
+            </mat-form-field>
+            <button mat-raised-button color="primary" class="execAutoCalc" (click)="execAutoCalc();" fxFlex="20">自動計算</button>
+        </div>
+        <div *ngIf="isLoaded" class="usersTable">
+            <table mat-table [dataSource]="dataSource" class="usersTable">
+                <ng-container matColumnDef="select">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <mat-checkbox (change)="$event ? masterToggle() : null"
+                                      [checked]="selection.hasValue() && isAllSelected()"
+                                      [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                      [aria-label]="checkboxLabel()"
+                        >
+                        </mat-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-checkbox (click)="$event.stopPropagation()"
+                                      (change)="changeSelect($event, row)"
+                                      [checked]="selection.isSelected(row)"
+                                      [aria-label]="checkboxLabel(row)"
+                        >
+                        </mat-checkbox>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>利用者</th>
+                    <td mat-cell *matCellDef="let row" [class.disable]="!selection.isSelected(row)">
+                        <div class="inputUserName" (click)="changeSelect($event, row)">{{row.data.cardUserName}}</div>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="emailAddress">
+                    <th mat-header-cell *matHeaderCellDef>メールアドレス</th>
+                    <td mat-cell *matCellDef="let i = index">
+                        <mat-form-field class="inputEmailAddress">
+                            <input [(ngModel)]="models[i].data.cardUserId"
+                                [formControl]="models[i].userControl"
+                                [matAutocomplete]="auto"
+                                (focus)="getAutoComplate()"
+                                type="email"
+                                name="inputEmailAddress_{{ i }}"
+                                autocomplete="off"
+                                matInput required
+                            >
+                            <mat-autocomplete #auto="matAutocomplete">
+                                <mat-option *ngFor="let user of models[i].filteredUsers | async" [value]="user.emailAddress" [id]="user.emailAddress">
+                                    {{user.emailAddress}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="returnAmount">
+                    <th mat-header-cell *matHeaderCellDef>返金額</th>
+                    <td mat-cell *matCellDef="let i = index;let row">
+                        <mat-form-field class="inputReturnAmonunt">
+                            <span matPrefix [class.disable]="!selection.isSelected(row)">¥&nbsp;</span>
+                            <input matInput required [(ngModel)]="models[i].data.returnAmount" 
+                                maxlength="5" 
+                                type="number"
+                                name="inputReturnAmonunt_{{ i }}"
+                                [disabled]="!selection.isSelected(row)"
+                                (input)="sumChange()"
+                            >
+                        </mat-form-field>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="returnMethod">
+                    <th mat-header-cell *matHeaderCellDef>返金方法</th>
+                    <td mat-cell *matCellDef="let i = index;let row">
+                        <mat-form-field class="inputReturnMethod">
+                            <mat-select matInput required [(ngModel)]="models[i].data.returnMethodCode"
+                                [disabled]="!selection.isSelected(row)"
+                                name="inputReturnMethod_{{ i }}"
+                            >
+                                <mat-option *ngFor="let item of returnMethods;" [value]="item.MethodCode">{{item.MethodName}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky:true" class="rowReturnAmount"></tr>
+                <tr mat-row *matRowDef="let row; columns:displayedColumns" class="rowReturnAmount"></tr>
+            </table>
+        </div>
+    </div>
+</mat-dialog-content>
+<mat-progress-bar name="progressbar" color="accent" mode="indeterminate" *ngIf="executionStatus.isExec"></mat-progress-bar>
+<mat-dialog-actions fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="end center">
+    <button mat-stroked-button mat-dialog-close [disabled]="!executionStatus.isReady" tabindex="-1" fxFlex="30">キャンセル</button>
+    <button mat-raised-button color="primary" (click)="execProcess();" [disabled]="!executionStatus.isReady" fxFlex="40">登録</button>
+</mat-dialog-actions>
+</form>

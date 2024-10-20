@@ -1,0 +1,31 @@
+/* 理由と内容欄の横スクロールの表示解除 */
+textarea.mat-input-element {
+    overflow: hidden;
+}
+
+/* Chips */
+mat-chip {
+    font-size: 90%;
+}
+
+/* input:number のスピンを消す
+参考：https://qiita.com/mrpero/items/c562cf9c2493bbbfe431
+*/
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* アラート */
+.alert-danger {
+    position: relative;
+    top:-15px;
+    margin-left: 16px;
+    font-size: 80%;
+}
+
+/* 横幅指定 */
+.size-m {
+    width: 220px;
+}

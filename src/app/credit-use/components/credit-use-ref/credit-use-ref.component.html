@@ -1,0 +1,102 @@
+<mat-dialog-content fxFlexLayout="row" fxLayoutAlign="space-between" *ngIf="isLoaded">
+    <div class="inputItems" fxFlex="50">
+        <div>
+            <mat-form-field>
+                <mat-label>利用日</mat-label>
+                <input [(ngModel)]="model.data.useDate" name="useDate" #useDate="ngModel"
+                 [matDatepicker]="picker" 
+                 matInput
+                 readonly
+                >
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field>
+                <mat-label>支払者</mat-label>
+                <input [(ngModel)]="model.data.cardUserName" name="cardUserName" #cardUserName="ngModel"
+                matInput readonly>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field>
+                <mat-label>科目</mat-label>
+                <input [(ngModel)]="model.data.accountName" name="accountName" #accountName="ngModel"
+                matInput readonly>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field>
+                <mat-label>カード利用額</mat-label>
+                <input [(ngModel)]="model.data.amount" name="amount" #amount="ngModel" matInput readonly>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field class="size-m">
+                <mat-label>理由</mat-label>
+                <textarea [(ngModel)]="model.data.reason" name="reason" #reason="ngModel" minRows="2"
+                 matInput cdkTextareaAutosize readonly
+                >
+                </textarea>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field class="size-m">
+                <mat-label>内容</mat-label>
+                <textarea [(ngModel)]="model.data.content" name="content" #content="ngModel"
+                matInput cdkTextareaAutosize readonly></textarea>
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="inputUsers" *ngIf="this.existUsers">
+        <div class="inputUsersHeader" fxLayout="row" fxLayoutGap="15px" *ngIf="this.existReturnAmount">
+            <mat-form-field class="returnSum" fxFlex="40">
+                <mat-label>返金額合計</mat-label>
+                <span matPrefix>¥&nbsp;</span>
+                <input [(ngModel)]="model.data.returnAmount" name="returnAmount" #amount="ngModel"
+                matInput readonly>
+            </mat-form-field>
+            <mat-form-field class="returnSum" fxFlex="40">
+                <mat-label>割振返金額合計</mat-label>
+                <span matPrefix>¥&nbsp;</span>
+                <input [(ngModel)]="model.data.returnAmountSum" name="sumReturnAmount" #amount="ngModel"
+                matInput readonly>
+            </mat-form-field>
+        </div>
+        <div class="usersTable">
+            <table mat-table [dataSource]="dataSource" class="usersTable">
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>利用者</th>
+                    <td mat-cell *matCellDef="let row">
+                        <div class="inputUserName">{{row.data.cardUserName}}</div>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="emailAddress">
+                    <th mat-header-cell *matHeaderCellDef>メールアドレス</th>
+                    <td mat-cell *matCellDef="let row">
+                        <div class="inputEmailAddress">{{row.data.cardUserId}}</div>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="returnAmount">
+                    <th mat-header-cell *matHeaderCellDef>返金額</th>
+                    <td mat-cell *matCellDef="let row">
+                        <div class="inputReturnAmonunt">
+                            <span matPrefix>¥&nbsp;</span>{{row.data.returnAmount}}
+                        </div>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="returnMethod">
+                    <th mat-header-cell *matHeaderCellDef>返金方法</th>
+                    <td mat-cell *matCellDef="let row">
+                        <div class="inputReturnMethod">{{row.data.returnMethodName}}</div>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky:true" class="rowReturnAmount"></tr>
+                <tr mat-row *matRowDef="let row; columns:displayedColumns" class="rowReturnAmount"></tr>
+            </table>
+        </div>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+    <button mat-stroked-button mat-dialog-close fxFlex="30">閉じる</button>
+</mat-dialog-actions>

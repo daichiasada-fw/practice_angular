@@ -1,0 +1,25 @@
+/* アラート */
+.alert-danger {
+    position: relative;
+    top:-15px;
+    margin-left: 16px;
+    font-size: 80%;
+}
+
+
+/* 入力エリア */
+mat-form-field {
+    width: 100%;
+}
+
+.itemWrapp{
+    display: flex;
+    align-items:center;
+}
+
+/* 入力エリアの名称 */
+.label {
+    color:rgba(0,0,0,.54);
+    width:70px;
+}
+

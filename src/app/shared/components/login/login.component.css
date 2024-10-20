@@ -1,0 +1,19 @@
+.login > button {
+    background-color: transparent;
+    border: none;
+}
+
+.loginWrapper{
+    height:100%;
+}
+
+div.login {
+    cursor: pointer;
+}
+
+div.login:hover{
+    background-color: #e8f0fe;
+    box-shadow: 
+        0 1px 3px 0 rgba(60,64,67,0.302),
+        0 4px 8px 3px rgba(60,64,67,0.149)
+}

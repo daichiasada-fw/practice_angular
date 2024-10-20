@@ -1,0 +1,12 @@
+<mat-dialog-content fxLayout="column"  fxLayoutGap="25px" fxLayoutAlign="space-around center">
+    <button mat-fab disableRipple="true" class="operaterIcon"
+    [style.backgroundImage]="'url(' + operator?.photoURL + ')'">
+    </button>
+    <div fxLayout="column" fxLayoutAlign="space-around center">
+        <div>{{operator?.displayName}}</div>
+        <div>{{operator?.email}}</div>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="column" fxLayoutAlign="space-around center">
+    <button mat-stroked-button tabindex="-1" (click)="logout();" style="margin-bottom:10px">ログアウト</button>
+</mat-dialog-actions>

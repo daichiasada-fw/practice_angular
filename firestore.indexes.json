@@ -1,0 +1,19 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "CreditUseTrans",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "bizYear",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "_createTimeStamp",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

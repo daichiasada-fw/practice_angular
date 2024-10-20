@@ -1,0 +1,70 @@
+.execAutoCalc {
+    height:28px;
+    line-height: 28px;
+}
+
+table.usersTable {
+    width:100%;
+}
+div.usersTable {
+    max-height:300px;
+    overflow-y:scroll;
+}
+
+mat-progress-bar {
+    margin-top: 12px;
+}
+
+/* 返金一覧 */
+.rowReturnAmount {
+    height: 30px;
+}
+
+tr.rowReturnAmount > td,
+tr.rowReturnAmount > th {
+    padding-left: 12px;
+}
+
+mat-form-field.inputReturnAmonunt {
+    width: 60px;
+}
+
+mat-form-field.inputEmailAddress {
+    width: 200px;
+}
+
+mat-form-field.inputReturnMethod {
+    width: 80px;
+}
+
+.inputUserName {
+    width: 100%;
+    cursor: pointer;
+}
+.disable {
+    color: rgba(0,0,0,.38);
+}
+
+/* inputカーソルオン*/
+input,textarea {
+    cursor: default;
+}
+
+/* 理由と内容欄の横スクロールの表示解除 */
+textarea.mat-input-element {
+    overflow: hidden;
+}
+
+/* 横幅指定 */
+.size-m {
+    width: 220px;
+}
+
+/* input:number のスピンを消す
+参考：https://qiita.com/mrpero/items/c562cf9c2493bbbfe431
+*/
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

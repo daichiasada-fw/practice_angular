@@ -1,0 +1,150 @@
+<mat-toolbar>
+    <mat-toolbar-row fxLayout="row" fxLayoutGap="15px">
+        <div class="title" fxFlex="18">クレジットカード<br>月別情報</div>
+        <mat-card class="search" fxLayout="row" fxLayoutGap="8px;" fxFlex="50">
+            <button mat-icon-button matPrefix matTooltip="検索" (click)="searchCresitUseHistory()" fxFlex="5" fxFlexOffset="6">
+                <mat-icon matPrefix class="searchIcon">search</mat-icon>
+            </button>
+            <input [(ngModel)]="searchOptions.searchWord" type="search" [placeholder]="searchPlaceholder" (keyup.enter)="searchCresitUseHistory()" (keyup)="searchAll($event)" fxFlex="80"/>
+        </mat-card>
+        <mat-select [(ngModel)]="this.searchOptions.bizYear" name="bizYear" matInput class="selectBizYear" (selectionChange)="searchBizYear()" fxFlex="8">
+            <mat-option *ngFor="let year of selectBizYears;" [value]="year">{{year}}年度</mat-option>
+        </mat-select>
+        <button mat-mini-fab fxFlexOffset="20" [matTooltip]="operatorText" class="operaterIcon" matTooltipClass="toolTipOperator"
+        [style.backgroundImage]="'url(' + operator?.photoURL + ')'"
+        (click)="openDialogOperatorInfo();"
+        >
+        </button>
+    </mat-toolbar-row>
+</mat-toolbar>
+<mat-drawer-container>
+    <mat-drawer mode="side" opened class="left-drawer">
+        <button mat-raised-button class="addButton" (click)="openDialogAdd();">
+            <div style="display:inline-flex;">
+                <mat-icon class="addIcon">add</mat-icon>
+                <span class="addText">作成</span>
+            </div>
+        </button>
+        <mat-list>
+            <mat-list-item fxLayout="row">
+                <mat-icon>credit_card</mat-icon>
+                <span class="sideMenu">クレジットカード</span>
+                <button class="sideMenu" mat-icon-button [matMenuTriggerFor]="creditMenu">
+                    <mat-icon>navigate_next</mat-icon>
+                </button>
+                <mat-menu #creditMenu="matMenu" xPosition="after" yPosition="below">
+                    <button mat-menu-item (click)="router.navigateByUrl('credituse/hist');">
+                        <span>利用報告</span>
+                    </button>
+                    <button mat-menu-item (click)="router.navigateByUrl('credituse/monthcheck');">
+                        <span>月別情報</span>
+                    </button>
+                    <button mat-menu-item (click)="router.navigateByUrl('credituse/monthcheck');">
+                        <span>カード保持者管理</span>
+                    </button>
+                </mat-menu>
+            </mat-list-item>
+            <mat-divider class="sideMenu"></mat-divider>
+            <mat-list-item fxLayout="row">
+                <mat-icon>credit_card</mat-icon>
+                <span class="sideMenu">振り込み</span>
+                <button class="sideMenu" mat-icon-button [matMenuTriggerFor]="creditMenu">
+                    <mat-icon>navigate_next</mat-icon>
+                </button>
+                <mat-menu #creditMenu="matMenu" xPosition="after" yPosition="below">
+                    <button mat-menu-item (click)="router.navigateByUrl('credituse/hist');">
+                        <span>利用報告</span>
+                    </button>
+                    <button mat-menu-item (click)="router.navigateByUrl('credituse/monthcheck');">
+                        <span>月別情報</span>
+                    </button>
+                    <button mat-menu-item (click)="router.navigateByUrl('credituse/monthcheck');">
+                        <span>カード保持者管理</span>
+                    </button>
+                </mat-menu>
+            </mat-list-item>
+        </mat-list>
+    </mat-drawer>
+    <mat-drawer-content>
+        <div fxLayout="row" fxLayoutGap="15px" *ngIf="!showSearchProgress">
+            <mat-tab-group class="selectMonth" disablePagination (selectedTabChange)="viewReportInfo($event);" [selectedIndex]="currentMonthIndex"> 
+                <mat-tab *ngFor="let report of creditUseReports;" [label]="report.month + '月'" [disabled]="isDisabled(report.order)"></mat-tab>
+            </mat-tab-group>
+            <div class="reportInfo" fxLayout="column" fxLayoutAlign="end none">
+                <div fxFlext="50"><span class="label">請求期間</span>{{viewReport?.inVoiceDateFrom | firebaseTimeStamp2date | date:'M/d'}}　～　{{viewReport?.inVoiceDateTo | firebaseTimeStamp2date | date:'M/d'}}</div>
+                <div fxFlext="50"><span class="label">合計金額</span>{{sumAmount | currency: 'JPY'}}</div>
+            </div>
+        </div>
+        <mat-drawer-container autosize>
+            <mat-drawer mode="side" position="end" opened>
+                <button (click)="opened = !opened" mat-raised-button>T</button>
+                <div [hidden]="!opened" style="background-color:red;">
+                    <canvas #myCanvas height="400" width="600"></canvas>
+                    <div>
+                        幅<input type="range" min="1" max="400" [(ngModel)]="rectW" /><br>
+                        高さ<input type="range" min="1" max="400" [(ngModel)]="rectH" /><br>
+                        塗りの色<input type="color" placeholder="color"  [(ngModel)]="rectC" value="{{rectC}}"/>
+                    </div>
+                </div>
+            </mat-drawer>
+            <div [class.loading]="showSearchProgress" [class.contents]="!showSearchProgress">
+                <mat-progress-spinner color="primary" mode="indeterminate" *ngIf="showSearchProgress"></mat-progress-spinner>
+                <table mat-table [dataSource]="dataSource" [hidden]="showSearchProgress">
+                    <ng-container matColumnDef="useDate">
+                        <th mat-header-cell *matHeaderCellDef></th>
+                        <td mat-cell *matCellDef="let data"> {{data.data.useDate.toDate() | date:'M/d'}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="accountName">
+                        <th mat-header-cell *matHeaderCellDef>科目</th>
+                        <td mat-cell *matCellDef="let data"> {{data.data.accountName}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="reason">
+                        <th mat-header-cell *matHeaderCellDef>理由</th>
+                        <td mat-cell *matCellDef="let data">
+                            <pre>{{data.data.reason}}</pre>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="content">
+                        <th mat-header-cell *matHeaderCellDef>内容</th>
+                        <td mat-cell *matCellDef="let data"> 
+                            <pre>{{data.data.content}}</pre>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="amount">
+                        <th mat-header-cell *matHeaderCellDef arrowPosition="before" class="col-number">利用額</th>
+                        <td mat-cell *matCellDef="let data" class="col-number"> {{data.data.amount | currency : 'JPY'}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="returnAmount">
+                        <th mat-header-cell *matHeaderCellDef arrowPosition="before" class="col-number">返金額</th>
+                        <td mat-cell *matCellDef="let data" class="col-number"> {{data.data.returnAmount | currency : 'JPY'}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="_createTimeStamp">
+                        <th mat-header-cell *matHeaderCellDef>登録日</th>
+                        <td mat-cell *matCellDef="let data"> {{data.data._createTimeStamp.toDate() | date:'shortDate'}} </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;" valign="top" (click)="openDialogRef(row.data)"></tr>
+
+                    <!-- Group header -->
+                    <ng-container matColumnDef="groupHeader">
+                        <td mat-cell colspan="999" *matCellDef="let data">
+                            <div fxLayout="row">
+                                <mat-icon style="width:30px" *ngIf="data.isOpen">expand_less</mat-icon>
+                                <mat-icon style="width:30px" *ngIf="!data.isOpen">expand_more</mat-icon>
+                                <strong fxFlex="70">{{data.data.cardUserName}}</strong>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <tr mat-row *matRowDef="let row; columns: ['groupHeader']; when: isGroup" (click)="groupHeaderClick(row)"></tr>
+                </table>
+            </div>
+        </mat-drawer-container>
+    </mat-drawer-content>
+</mat-drawer-container>

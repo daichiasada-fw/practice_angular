@@ -1,0 +1,45 @@
+<form #formCheck="ngForm" class="formCheck">
+<mat-dialog-content fxLayout="column" fxLayoutGap="15px">
+    <div>
+        <mat-form-field>
+            <mat-label>請求対象月</mat-label>
+            <mat-select [(ngModel)]="model.month" name="month" #accountCode="ngModel"
+            matInput required
+            >
+                <mat-option *ngFor="let month of months;" [value]="month">{{month}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field>
+            <mat-label>請求期間開始日</mat-label>
+            <input [(ngModel)]="model.inVoiceDateFrom" #inVoiceDateFrom="ngModel" name="inVoiceDateFrom"
+            [matDatepicker]="picker"
+            matInput required readonly
+            >
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field>
+            <mat-label>請求期間終了日</mat-label>
+            <input [(ngModel)]="model.inVoiceDateTo" #inVoiceDateTo="ngModel" name="inVoiceDateTo"
+            [matDatepicker]="picker"
+            matInput required readonly
+            >
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <div *ngIf="inVoiceDateTo.invalid && (inVoiceDateTo.dirty || inVoiceDateTo.touched)" class="alert alert-danger">
+            <div *ngIf="inVoiceDateTo.errors.required">日付は必ず入力ください。</div>
+        </div>
+    </div>
+    </mat-dialog-content>
+    <mat-progress-bar name="progressbar" color="accent" mode="indeterminate" *ngIf="executionStatus.isExec"></mat-progress-bar>
+    <mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between stretch">
+        <button mat-stroked-button mat-dialog-close [disabled]="!executionStatus.isReady" tabindex="-1" fxFlex="40">キャンセル</button>
+        <button mat-raised-button color="primary" fxFlex="50" (click)="execProcess();" 
+        [disabled]="formCheck.invalid || !executionStatus.isReady">登録</button>
+    </mat-dialog-actions>
+</form>

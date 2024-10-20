@@ -1,0 +1,7 @@
+<mat-dialog-content class="message" *ngIf="executionStatus.isReady">削除します。よろしいですか。</mat-dialog-content>
+<mat-dialog-content class="message" *ngIf="executionStatus.isFinish">削除が完了しました。</mat-dialog-content>
+<mat-progress-bar name="progressbar" color="accent" mode="indeterminate" *ngIf="executionStatus.isExec"></mat-progress-bar>
+<mat-dialog-actions fxLayout="row">
+    <button mat-stroked-button mat-dialog-close [disabled]="!executionStatus.isReady" fxFlex="49">キャンセル</button>
+    <button mat-raised-button color="primary" (click)="execProcess();" [disabled]="!executionStatus.isReady" fxFlex="49">削除</button>
+</mat-dialog-actions>
